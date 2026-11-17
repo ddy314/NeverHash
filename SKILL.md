@@ -78,8 +78,8 @@ Report substantive changes and verification results directly. Do not add a long 
 
 ## Example
 
-**Before:** "For additional information about the installation process, please refer to [this page](docs/setup.md). It should be noted that some environments may require additional configuration."
+**Before:** "For additional information about the writing rules, please refer to [this page](SKILL.md). It should be noted that individual situations might require additional consideration."
 
-**After:** "The [setup guide](docs/setup.md) explains installation and environment requirements."
+**After:** "The [Neverhash policy](SKILL.md) defines writing, documentation, and commit rules."
 
-The revised sentence gives the link a purpose and removes an undefined warning. If a specific environment requires a necessary step, state that step in the relevant instructions.
+The revised sentence gives the link a purpose and removes an undefined warning. State a real exception when it affects the reader's action.
