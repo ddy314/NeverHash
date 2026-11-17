@@ -6,33 +6,50 @@ AI Agent 经常为一项简单任务生成多个说明文件、临时脚本和�
 
 ## What Changes
 
-例如，一个研究仓库可能逐渐变成：
+随着项目规模扩大，缺乏规范的仓库常在根目录堆积阶段性报告、临时脚本、版本号后缀目录与散乱测试：
 
 ~~~text
-project/
+compiler/
 ├── README.md
 ├── project-overview.md
-├── results-final.md
-├── results-final-v2.md
+├── architecture-v2.md
 ├── audit-report.md
-├── run-output.txt
 ├── experiment-2026-11-17.py
-└── paper/
+├── run-output.txt
+├── parser_new/
+├── layout_final/
+└── scripts/
+    ├── smoke_test.sh
+    └── check_hashes.py
 ~~~
 
-应用 NeverHash 后，仓库可以围绕仍然有效的成果组织：
+应用 NeverHash 后，根目录保持精简，子系统按处理阶段与职责横向扩展，文档与测试同构对齐：
 
 ~~~text
-project/
+compiler/
+├── Cargo.toml
 ├── README.md
-├── paper/
-├── computations/
-└── tests/
+├── crates/
+│   ├── compiler/
+│   ├── compiler-cli/
+│   ├── compiler-syntax/
+│   ├── compiler-eval/
+│   ├── compiler-layout/
+│   └── compiler-pdf/
+├── docs/
+│   ├── dev/
+│   │   └── architecture.md
+│   └── reference/
+├── tests/
+│   ├── ref/
+│   ├── src/
+│   └── suite/
+└── tools/
 ~~~
 
-README 直接解释研究问题、主要发现和使用入口。论文、计算程序及测试各有用途。临时运行记录由开发过程管理，重复说明被整合或删除。
+README 直接解释项目用途、核心能力与使用入口。子模块按职责边界平铺拆分，架构文档交代全局目录与数据流阶段，测试集按功能域组织。临时运行记录由开发过程管理，重复说明被整合或删除。
 
-NeverHash 优先追求顺畅阅读与完整叙述，并明确采用 **流畅性 > 准确性** 的写作优先级。它借鉴 [ASD-STE100 Skill](https://github.com/danyuchn/asd-ste100-skill) 的简洁语言风格，将关注点进一步扩展到仓库结构和内容选择。
+NeverHash 优先追求顺畅阅读与完整叙述，并明确采用 **流畅性 > 准确性** 的写作优先级。
 
 ## Usage
 
