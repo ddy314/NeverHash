@@ -25,7 +25,7 @@ NeverHash 规范 AI Agent 如何组织仓库、撰写技术文档和提交修改
 
 > 优化后的程序在测试中运行得更快。性能差异随输入规模变化。
 
-每句话都应帮助读者理解事实、作出判断或执行操作。删除空泛评价、自我表扬、重复结论、无关背景和作者对自身写作过程的解释。无法证明必要性的内容应当删除。
+每句话都应帮助读者理解事实、作出判断或执行操作。删除空泛评价、自我表扬、重复结论、无关背景、借鉴来源说明和作者对自身写作过程的解释。无法证明必要性的内容应当删除。
 
 ### 1.2 Sentences and Paragraphs
 
@@ -43,37 +43,52 @@ NeverHash 规范 AI Agent 如何组织仓库、撰写技术文档和提交修改
 
 ### 1.3 Direct and Affirmative Language
 
-直接说明行为、目的、事实和结论。优先使用肯定表达、主动语态与具体动词。一个概念使用稳定名称，不要为了变化措辞而反复替换同义词。
+直接说明行为、目的、事实和结论。优先使用肯定表达、主动语态与具体动词。需要说明范围或前提时，直接写出已测量的条件、数据集和适用边界。区分观察结果、推导和计划，不要将推测写成事实，也不要列举所有理论上可能的例外。
 
-减少“值得注意的是”“需要强调的是”“这不意味着”“不能完全排除”等引导语和防御性修辞。需要说明范围时，直接写出已知范围。
+**严禁在任何项目文本（文档、注释、界面文案、Commit Message、PR 描述）中使用以下防御性、否定式或过程自证话术模式。** 按语义判断，不得用同义改写绕过；一旦出现，直接改写为正面事实陈述（代码关键字、公开接口字段、数学形式化命题与原样引文除外）：
 
-**Poor**
+| Pattern | Forbidden Forms (Poor) | Affirmative Rewrite (Good) |
+| --- | --- | --- |
+| 范围与身份预否认 | `This is not …`、`This does not prove/imply/constitute …`、`这不是……`、`并不意味着……`、`不能证明……`、`不应解释为……`<br>例：`This is anomaly detection, not fault-ID classification.` | 直接定义系统执行的任务或作用范围。<br>例：`The monitor detects anomalies in process streams.` |
+| 否定式对比转折 | `not X, but Y`、`rather than`、`instead of`、`不是……而是……`、`并非……而是……`、`不只是……更是……`<br>例：`这些贡献是统计残差权重，不是物理根因。` | 删去被否定的一侧，直接陈述实际含义。<br>例：`贡献分数度量各变量的统计残差权重。` |
+| 免责承诺与模糊限定 | `does not guarantee`、`no generalization guarantee`、`may or may not`、`preliminary only`、`并不构成泛化保证`、`仅供参考`、`在一定程度上`<br>例：`Empirical calibration does not guarantee a target false-alarm rate.` | 写出具体的标定方式、评测数据集与观测指标。<br>例：`Thresholds are calibrated on the training split and evaluated on held-out test runs.` |
+| 资质与成熟度免责 | `not production-ready`、`not safety-certified`、`not real plant measurements`、`非生产级`、`不属于安全认证工具`、`不是真实工厂数据`、`不是置信区间`<br>例：`不是工业真实数据，也不属于安全认证决策工具。` | 说明当前支持的工作流、运行环境或统计量定义。<br>例：`系统在 TEP 仿真数据上运行离线事件分析。` |
+| 工程与历史自证 | `no files were overwritten`、`no other PR was merged`、`without relaxing validation`、`本次没有覆盖历史产物或放宽校验`、`本轮没有合并其他 PR`<br>例：`没有强推或删除历史分支，本轮没有合并其他 PR。` | 直接删除；版本变迁与合并范围由 Git 历史记录。 |
+| 范围洗白与未完成播报 | `this change only …`、`outside the current scope`、`has not been uploaded/submitted`、`本次仅……`、`不在本次范围内`、`尚未上传/尚未独立验证`、`留待后续研究`<br>例：`此文件尚未上传 YouTube 或提交 Devpost。` | 只陈述当前已交付的成果与使用方式。<br>例：`演示视频保存在 video/ 目录，可由构建脚本生成。` |
+| 展示型验证与哈希堆砌 | `all hashes remain unchanged`、`verification receipt`、`smoke test passed`、`57 个历史文件哈希不变`、`结构化验收回执`、`CI 全绿`、`详见审计文件`<br>例：`2,482 个原始与结果文件哈希保持一致，冒烟测试通过。` | 删除表面自证，用可执行的测试与核心实验结果支撑结论。 |
+| 空泛引导与元叙述 | `it is worth noting that`、`to avoid confusion`、`for the avoidance of doubt`、`值得注意的是`、`需要强调的是`、`为避免误解`、`显而易见`<br>例：`值得注意的是，为避免误解，该算法并不在所有问题上最优。` | 删除引导语，直接陈述结论及测试范围。<br>例：`该算法在当前测试问题中表现更好。` |
 
-> 这一结果并不意味着算法在所有问题中都一定优于其他方法。
+### 1.4 Don't Repeat Yourself (DRY)
 
-**Good**
+同一事实、规则、定义或结论只写一次：
 
-> 该算法在当前测试问题中表现更好。
+- **不在同一处叠加多种形式**：用段落、列表或表格中的一种把问题讲清即可。禁止先罗列一遍，紧接着再用另一种形式重复同一批内容。
+- **不维护简版与详版两套列表**：同一内容只保留唯一完整表述，不要在主文档写一部分，又在外部文件中重复维护扩充版本。
+- **同一定义与符号只用一种形式**：任何概念、符号、指标或结构在全仓只定义一次，后续统一沿用首次确立的名称与记号。禁止在不同章节或文件中换用新名字、新记号将相同或高度相近的内容重新定义一遍。
+- **不跨章节重复背景与前提**：共享的假设与实验条件在首次出现时集中说明，不在后续章节反复重申。
+- **单一工作语言**：同一项目统一使用一种主语言撰写文档、注释与提交说明，不在正文中混用中英文或用双语并列重复同一句话。
 
-明确说明影响结论的假设，并区分观察结果、推导和计划。不要将推测写成事实，也不要列举所有理论上可能的例外。
+### 1.5 Show a Concrete Example
 
-### 1.4 Show a Concrete Example
+解释复杂机制或架构设计时，先提供一个完整而简短的具体实例，再总结一般规律。实例只保留说明当前机制所需的部分。
 
-解释复杂概念时，先提供一个完整而简短的示例，再总结一般规律。示例只保留当前概念需要的部分。
-
-例如，介绍语法分析器的运算符优先级时，可以先展示：
+例如，解释增量语法分析器如何在局部编辑后维持下游缓存命中时，可以先展示一次局部重解析前后的节点编号（Span）分配：
 
 ~~~text
-Input: 2 + 3 * 4
+Before edit:
+Document [100..500]
+├── Heading("Intro") [150]
+├── Paragraph("Old text") [220..260]
+└── Paragraph("Unchanged") [380..420]
 
-Add
-├── Number(2)
-└── Multiply
-    ├── Number(3)
-    └── Number(4)
+After editing the first paragraph:
+Document [100..500]
+├── Heading("Intro") [150]
+├── Paragraph("Updated longer text") [220..290]
+└── Paragraph("Unchanged") [380..420]
 ~~~
 
-读者可以直接看到乘法如何处于加法的子树中。随后解释语法规则即可，无需展示全部解析器实现。
+读者可以直接看到局部编辑只重新分配 `[220..290]` 区间内的节点编号，后续段落的编号 `[380..420]` 保持稳定，因此以节点编号为键的增量缓存依然有效。随后再说明编号区间预留策略即可，无需贴出完整重解析代码。
 
 ## 2. Documents
 
@@ -106,9 +121,9 @@ docs/
 
 ### 2.3 Natural Reading Order
 
-按照读者理解问题的过程组织章节。项目说明通常先介绍用途、功能和使用方式，再进入设计。研究说明通常先提出问题与主要发现，再解释方法和证据。依据实际内容决定章节，禁止为了迎合模板而创建空章节。
+按照读者理解问题的过程组织章节。项目说明先介绍用途、功能和使用方式，再进入设计。架构文档先给出顶层目录职责图谱，再按系统核心处理阶段（例如 `Parsing → Evaluation → Layout → Export`）依次说明每一阶段的输入输出、关键数据结构与模块位置。研究说明先提出问题与主要发现，再解释方法和证据。依据实际内容决定章节，禁止为了迎合模板而创建空章节。
 
-同一章节应围绕一个主题展开。解释解析器时，集中说明词法分析、语法分析与语法树之间的关系。构建环境、历史实验和发布计划应在各自合适的位置说明。
+同一章节围绕一个主题展开。构建环境、历史实验和发布计划应在各自合适的位置说明。
 
 ### 2.4 Purposeful Links
 
@@ -126,74 +141,132 @@ docs/
 
 ## 3. Repository Structure
 
-### 3.1 Organize by Responsibility
+### 3.1 Scale Horizontally with a Flat Root
 
-仓库应清楚呈现项目入口、核心实现、辅助功能、测试与示例。目录按职责划分，文件按用途命名。
+无论项目规模如何增长，仓库根目录始终保持精简，只放置入口文档（`README.md`、`CONTRIBUTING.md`、`LICENSE`）、工作区构建配置，以及少数几个顶层职责目录（如源码子包目录 `crates/` 或 `packages/`、文档目录 `docs/`、测试目录 `tests/`、辅助工具目录 `tools/`）。禁止把新增模块、阶段脚本或实验目录直接堆在根目录。
 
-一个小型 Python 项目可以采用：
+当系统规模扩大时，**按处理阶段或独立职责在子包目录内横向平铺拆分**，不要向深处堆叠多层抽象目录（如 `src/core/internal/engine/v2/`）：
+
+- **主入口与薄封装层分离**：核心库编排完整流程，CLI 或 IDE 服务作为薄封装层置于同级子包。
+- **处理流水线分包**：词法与语法树、语义求值、排版或核心计算、各类导出后端各自成为同级子包，并以统一前缀命名。
+- **子包内部先平铺、按需建子目录**：子包内优先将单文件模块平铺（如 `ast.rs`、`lexer.rs`、`parser.rs`、`span.rs`）；只有当某个子领域（如排版中的 `flow/`、`grid/`、`inline/`、`math/`、`pages/`）确实包含多个紧密协作的实现文件时，才向下建立一层子目录。
+
+**Good：随规模横向扩展的多子系统仓库**
 
 ~~~text
-project/
+compiler/
+├── Cargo.toml
 ├── README.md
-├── pyproject.toml
-├── src/
-│   └── project/
-│       ├── main.py
-│       └── converter.py
+├── crates/
+│   ├── compiler/          # 顶层编译入口与主流程编排
+│   ├── compiler-cli/      # 命令行薄封装层
+│   ├── compiler-syntax/   # 词法、无类型语法树、类型化 AST 与增量重解析
+│   │   └── src/
+│   │       ├── ast.rs
+│   │       ├── lexer.rs
+│   │       ├── lib.rs
+│   │       ├── node.rs
+│   │       ├── parser.rs
+│   │       ├── reparser.rs
+│   │       └── span.rs
+│   ├── compiler-eval/     # 虚拟机、作用域栈与模块求值
+│   ├── compiler-layout/   # 排版引擎：简单模块平铺，复杂模式单建一层子目录
+│   │   └── src/
+│   │       ├── flow/
+│   │       ├── grid/
+│   │       ├── inline/
+│   │       ├── math/
+│   │       ├── pages/
+│   │       ├── lib.rs
+│   │       ├── lists.rs
+│   │       └── shapes.rs
+│   ├── compiler-pdf/      # PDF 导出后端
+│   ├── compiler-svg/      # SVG 导出后端
+│   └── compiler-utils/    # 跨模块通用工具
+├── docs/
+│   ├── dev/
+│   │   └── architecture.md
+│   └── reference/
 ├── tests/
-│   └── test_converter.py
-└── examples/
-    └── basic_usage.py
+│   ├── ref/               # 基准参考输出
+│   ├── src/               # 测试驱动与校验器
+│   └── suite/             # 按功能域划分的集成测试集
+│       ├── layout/
+│       ├── math/
+│       ├── scripting/
+│       └── syntax/
+└── tools/                 # 开发与调试辅助工具
 ~~~
 
-这些目录应随真实需求出现。单文件工具可以只有少量必要文件。只有当模块拥有多个内部组件时，才创建更深层级。避免为了表面上的模块化而增加目录。
-
-### 3.2 Order Within Directories
-
-读者应先找到入口和主要功能，再找到辅助实现与补充内容。同层文件使用统一、稳定、语义清楚的名称，让普通文件排序便于查找。
-
-**Good**
+**Poor：根目录膨胀与纵向嵌套失控**
 
 ~~~text
-parser/
-├── ast.py
-├── lexer.py
-├── parser.py
-└── tokens.py
+compiler/
+├── README.md
+├── ARCHITECTURE_V2.md
+├── stage1_summary.md
+├── run_all_checks.sh
+├── pdf_export_new/
+├── src/
+│   └── core/
+│       └── internal/
+│           └── engine/
+│               ├── 01_tokenize.rs
+│               ├── 02_parse_new.rs
+│               ├── parser_final.rs
+│               └── math_layout_v2.rs
+├── scripts/
+│   ├── smoke_test_2026.py
+│   └── verify_hashes.py
+└── test_outputs_backup/
 ~~~
 
-**Poor**
+### 3.2 Align Tests and Tooling with Domain Boundaries
 
-~~~text
-parser/
-├── 01_start.py
-├── 02_process.py
-├── parser_new.py
-└── parser_final.py
-~~~
+随着功能增加，测试与文档应与核心子模块保持同构：
 
-前者用职责区分文件。后者依赖开发阶段与无意义的顺序编号。需要读者按照顺序执行的操作，应写在使用说明中。
+- **测试套件按功能域分目录**：在 `tests/suite/` 下按系统功能域（如 `syntax/`、`scripting/`、`layout/`、`math/`、`pdf/`）组织测试用例，将测试运行器（`tests/src/`）与参考输出（`tests/ref/`）分离。禁止按开发批次、Issue 编号或临时验证堆积 `test_stage1`、`smoke_test`、`regression_new`。
+- **同层文件按职责命名排序**：目录内使用统一的领域名词命名，让文件按字母序自然呈现模块结构，不依赖 `01_`、`02_` 等序号前缀编码执行顺序。
 
 ### 3.3 Semantic Names
 
-文件名应准确描述内容或功能，长期保持稳定。避免使用 `new`、`old`、`latest`、`final` 和无意义的数字后缀。
+目录、子包与文件名应准确描述职责或领域概念，长期保持稳定。避免使用 `new`、`old`、`latest`、`final` 和无意义的数字后缀。
 
 | Poor | Good | Reason |
 | --- | --- | --- |
-| `test2.py` | `test_parser.py` | 明确测试对象 |
-| `new_algorithm.cpp` | `search.cpp` | 描述功能 |
-| `results_final.md` | `evaluation.md` | 描述主题 |
-| `script.py` | `export_dataset.py` | 描述行为 |
-| `run_2026_11_17.csv` | `validation_samples.csv` | 名称不依赖日期 |
-| `misc/` | `formatting/` | 明确目录职责 |
+| `compiler_v2/` | `compiler-layout/` | 标明子系统职责而非迭代代数 |
+| `parser_final.rs` | `reparser.rs` | 区分增量重解析与全量解析职责 |
+| `test2.py` | `tests/suite/syntax/` | 按被测功能域归类 |
+| `results_final.md` | `docs/dev/architecture.md` | 明确文档受众与主题 |
+| `run_2026_11_17.csv` | `validation_samples.csv` | 名称不依赖运行日期 |
+| `misc/` | `compiler-utils/` | 明确跨模块基础工具边界 |
 
 **新文件名禁止包含具体日期和时间。** 修改时间由 Git 保存。保留构建工具、语言生态与公共接口要求的标准名称。
 
-### 3.4 Research Repositories
+### 3.4 Research and Benchmark Repositories
 
-研究仓库可以按照论文、证明、计算程序和测试的职责组织。例如，最大行列式研究中的论文负责提出问题及主要定理，证明材料保存完整推导，计算程序验证相关的有限情形。
+大型研究与基准评测仓库同样保持精简根目录，按论文（`paper/`）、形式化证明（`proofs/`）、核心算法与评测实现（`benchmarks/` 或 `src/`）及测试（`tests/`）划分顶层目录：
 
-适用时可以使用 `paper/`、`proofs/` 和 `computations/`。规模较小时，将相关内容放在现有文件中更简单。历史尝试和临时参数搜索应交给合适的研究记录，避免侵占正式论文与项目入口。
+~~~text
+study/
+├── README.md
+├── pyproject.toml
+├── paper/
+│   ├── main.tex
+│   └── sections/
+├── proofs/
+│   └── theorem_bounds.lean
+├── benchmarks/
+│   ├── datasets/
+│   ├── methods/
+│   ├── metrics.py
+│   └── runner.py
+└── tests/
+    ├── test_methods.py
+    └── test_metrics.py
+~~~
+
+新增对比算法、数据集或实验工况时，将其作为同级模块并入 `benchmarks/methods/` 或 `benchmarks/datasets/`，由统一的 `runner.py` 调度并更新权威结果表。禁止每做一轮实验就在 `docs/` 或根目录新建 `stage-one-validation.md`、`benchmark-expanded.md`、`integration-2026-10-23.md` 等阶段性报告。
 
 ## 4. Technical Detail and Evidence
 
@@ -223,18 +296,7 @@ Git 历史记录版本变化，Issues 与 PR 记录讨论及决策，测试程�
 
 提交具有明确长期用途的源代码、构建配置、测试、可移植脚本与文档。小型样本可用于展示格式或验证行为。体积过大的实验数据应保存在适合的数据存储中，并提供必要的获取说明。
 
-**除非用户明确要求，禁止提交** Agent 专属目录（如 `.codex/` 和 `.claude/`）、一次性提示词、个人工作状态、本机绝对路径脚本、控制台输出、缓存、临时报告和重复生成结果。
-
-例如，脚本可以接收输入路径：
-
-~~~python
-from pathlib import Path
-import sys
-
-data = Path(sys.argv[1]).read_text()
-~~~
-
-这种接口能够在不同机器上使用。个人桌面目录的硬编码路径不应成为项目的运行前提。
+**除非用户明确要求，禁止提交** Agent 专属目录（如 `.codex/` 和 `.claude/`）、一次性提示词、个人工作状态、硬编码本机绝对路径的脚本、控制台输出、缓存、临时报告和重复生成结果。脚本与工具应通过命令行参数、配置文件或相对工作区路径接收输入，不得将个人桌面或本机目录作为运行前提。
 
 ### 5.2 Add CI/CD Only for a Real Need
 
